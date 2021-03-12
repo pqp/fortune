@@ -1,0 +1,29 @@
+body {
+   background-color: black; 
+   color: gray;
+   font-family:'Inconsolata', monospace;
+}
+
+div.main {
+    text-align: center;
+}
+
+div.sidebar {
+    color: darkseagreen;
+    font-size: large;
+}
+
+span.emp {
+    color: slateblue;
+}
+
+button.blast {
+    margin: 20px 20px 20px 20px;
+}
+
+div.view {
+    overflow: hidden;
+    overflow-y: scroll;
+    height: 200px;
+    border: solid;
+}
