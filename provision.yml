@@ -1,0 +1,19 @@
+---
+
+  - name: Initial setup
+    hosts: aws
+    remote_user: ec2-user
+    
+    tasks:
+    - name: Ensure NodeJS is installed
+      become: yes
+      yum:
+        name: nodejs
+        state: latest
+
+    - name: Sync codebase
+      synchronize: 
+        src: ~/fortune/site
+        dest: ~/site
+        rsync_opts:
+          - "--exclude=node_modules"

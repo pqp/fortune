@@ -2,6 +2,7 @@
 <html>
     <link href="styles.css" rel="stylesheet">
     <head>
+        <script src="bundle.js" async></script>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@500&display=swap" rel="stylesheet"> 
         <meta charset="utf-8">
@@ -11,8 +12,8 @@
         <div class="main">
             <h1>Subscribe for a daily fortune!</h1>
             <h2 id="fortune">You feel like you could...like you could...TAKE ON THE WORLD!</h2>
-            <input type="text">
-            <button>Subscribe</button>
+            <input type="email" id="test">
+            <button id="subscribe">Subscribe</button>
         </div>
         <div class="sidebar">
             <p>your server IP: 192.168.0.1</p>
@@ -20,9 +21,11 @@
             <ul id="serverlist"></ul>
             </ul>
         </div>
-        <div class="view">
-            <p id="console"></p>
-        </div>
-        <script src="bundle.js"></script>
+        <iframe class="view" id="consoleView"
+            title="Console View"
+            width="640"
+            height="480"
+            src="">
+        </iframe>
     </body>
 </html>

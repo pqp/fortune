@@ -1,23 +1,26 @@
-import { EC2, paginateDescribeReservedInstancesModifications } from "@aws-sdk/client-ec2";
-
 var view = document.getElementById('console');
+document.getElementById('subscribe').onclick = subscribe;
 
-var response = AWS.getConsoleOutput(params, function(err, data) {
-    if (err) console.log(err, err.stack);
-    else     console.log(data);
-
-    view.innerText = atob(data.Output);
-    view.scrollTop = view.scrollHeight;
-});
-
-function terminateInstance(e)
+function subscribe()
 {
-    console.log("hi");
+    let emailAddress = document.getElementById('test').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", '/', true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function() {
+        console.log("POST Finished");
+    }
+    xhr.send(`email=${emailAddress}&subscribe=true`);
 }
 
-function parseInstances(data)
+function parseInstances()
 {
-    const instances = data.Reservations;
+    const response = JSON.parse(this.responseText);
+    console.log(response);
+
+    const instances = response.Reservations;
     var serverList = document.getElementById('serverlist');
     var ticker = document.getElementById('ticker');
     let activeCount = 0;
@@ -49,7 +52,7 @@ function parseInstances(data)
         }
 
         if (state == "stopping")
-            item.style.color = '#600000';
+            item.style.color = '#599999';
         if (state == "stopped")
             item.style.color = '#F0F000';
         if (state == "terminated")
@@ -60,10 +63,19 @@ function parseInstances(data)
     ticker.innerText = "total servers allocated " + "(" + activeCount + "/5)";
 }
 
-function onDescribe(err, data)
+function probeInstances()
 {
-    if (err) console.log(err, err.stack);
-    else     parseInstances(data);
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", parseInstances);
+    xhr.open("GET", "/awsdata", true);
+
+    xhr.send();
 }
 
-AWS.describeInstances(params, onDescribe);
+function terminateInstance(e)
+{
+    console.log("Test!");
+    console.log("Test again1");
+}
+
+probeInstances();

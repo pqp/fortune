@@ -3,6 +3,7 @@ var path = require("path");
 module.exports = {
   // Specify the entry point for our app.
   entry: [path.join(__dirname, "main.js")],
+  watch: true,
   // Specify the output file containing our bundled code.
   output: {
     path: __dirname,
@@ -12,7 +13,8 @@ module.exports = {
    resolve:{
   fallback: { path: require.resolve("path-browserify") }
   },
-  mode: 'development'
+  mode: 'development',
+  devtool: 'inline-source-map'
    /**
    * In Webpack version v2.0.0 and earlier, you must tell 
    * webpack how to use "json-loader" to load 'json' files.

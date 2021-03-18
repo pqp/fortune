@@ -21,9 +21,10 @@ button.blast {
     margin: 20px 20px 20px 20px;
 }
 
-div.view {
+iframe.view {
     overflow: hidden;
     overflow-y: scroll;
-    height: 200px;
+    display: block;
+    margin: 0 auto;
     border: solid;
 }
