@@ -1,0 +1,112 @@
+---
+  - hosts: localhost
+    gather_facts: False
+
+    tasks:
+
+      - name: Create a security group
+
+        amazon.aws.ec2_group:
+          name: sec group
+          description: basic sec group
+          region: us-east-1
+          rules:
+            - proto: tcp
+              from_port: 22
+              to_port: 22
+              cidr_ip: 0.0.0.0/0
+
+      - name: Provision an instance
+
+        ec2:
+          key_name: pqp
+          instance_type: t2.micro
+          image: ami-042e8287309f5df03 # Ubuntu 20.04 Server AMI
+          group: sec group
+          wait: true
+          exact_count: 1
+          region: us-east-1
+          count_tag:
+            name: ami_template
+          instance_tags: 
+            name: ami_template
+        register: ec2
+
+      - name: Add instance IP to host group
+        add_host: hostname={{ item.public_ip }} groups=amihosts
+        loop: "{{ ec2.instances }}"
+
+  - hosts: amihosts
+    gather_facts: False
+    remote_user: ubuntu
+    become: yes
+    vars:
+      nodejs_version: node_14.x
+      ubuntu_codename: focal
+
+    tasks:
+
+      - name: Wait for SSH
+        wait_for_connection:
+          delay: 60
+          timeout: 320
+
+      - name: Install nodesource GPG key
+        apt_key:
+          url: "https://deb.nodesource.com/gpgkey/nodesource.gpg.key"
+          state: present
+
+      - name: Add nodesource deb to sources
+        apt_repository:
+          repo: "deb https://deb.nodesource.com/{{ nodejs_version }} {{ ubuntu_codename }} main"
+          state: present
+      
+      - name: Add nodesource deb-src
+        apt_repository:
+          repo: "deb-src https://deb.nodesource.com/{{ nodejs_version }} {{ ubuntu_codename }} main"
+          state: present
+
+      - name: Update apt cache
+        apt:
+          update_cache: yes
+
+      - name: Upgrade
+        apt:
+          upgrade: full
+
+      - name: Install build-essential
+        apt:
+          name: build-essential
+          state: latest
+
+      - name: Make sure git is installed
+        apt:
+          name: git
+          state: latest
+
+      - name: Install node.js 
+        apt:
+          name: nodejs
+          state: latest
+
+  - hosts: localhost
+    gather_facts: False
+
+    tasks:
+
+      - name: Create AMI
+
+        amazon.aws.ec2_ami:
+          instance_id: "{{ ec2.instance_ids[0] }}"
+          region: us-east-1
+          wait: yes
+          name: newtest
+          tags:
+            Name: newtesttag
+            Service: TestService
+
+      - name: Print string
+        
+        ansible.builtin.debug:
+          msg: "{{ ec2.instance_ids }}"
+        #loop: "{{ ec2.instances }}"
