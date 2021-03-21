@@ -1,5 +1,5 @@
 import express from "express";
-import exec from "child_process";
+import proc from "child_process";
 import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 import path from "path";
 
@@ -19,6 +19,9 @@ async function sendCommand(command, req, res)
     res.send(data);
 }
 
+app.get('/ttyshare', (req, res) => {
+});
+
 app.get('/awsdata', (req, res) => {
     try {
         const command = new DescribeInstancesCommand({});
@@ -35,7 +38,7 @@ app.get('/', (req, res) => {
 app.post('/', function (req, res) {
     res.send('Thanks for the POST!');
     console.log("We got a POST request, boys.");
-    exec('systemd-cat ansible-playbook ../provision.yml');
+    proc.exec('systemd-cat ansible-playbook ../provision.yml');
 });
 
 app.listen(port, () => {

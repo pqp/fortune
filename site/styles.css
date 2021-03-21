@@ -26,5 +26,17 @@ iframe.view {
     overflow-y: scroll;
     display: block;
     margin: 0 auto;
-    border: solid;
+}
+
+div#footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    display: block;
+
+    background-color: #FFFFFF20;
+}
+
+div#footer p {
+    color: #FFFFFFFF;
 }

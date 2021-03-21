@@ -1,6 +1,9 @@
 var view = document.getElementById('console');
 document.getElementById('subscribe').onclick = subscribe;
 
+var footer = document.getElementById('footer');
+var footerText = document.getElementById('message');
+
 function subscribe()
 {
     let emailAddress = document.getElementById('test').value;
@@ -10,9 +13,14 @@ function subscribe()
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     xhr.onreadystatechange = function() {
-        console.log("POST Finished");
+        updateFooter("POST sent to server")
     }
     xhr.send(`email=${emailAddress}&subscribe=true`);
+}
+
+function updateFooter(message)
+{
+    footerText.innerText = message;
 }
 
 function parseInstances()
@@ -65,6 +73,8 @@ function parseInstances()
 
 function probeInstances()
 {
+    updateFooter("Sending GET request...");
+
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("load", parseInstances);
     xhr.open("GET", "/awsdata", true);
