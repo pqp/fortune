@@ -2,6 +2,10 @@
   - hosts: localhost
     gather_facts: False
 
+    vars:
+      keypair: pqp
+      region: us-east-1
+
     tasks:
 
       - name: Create a security group
@@ -9,7 +13,7 @@
         amazon.aws.ec2_group:
           name: sec group
           description: basic sec group
-          region: us-east-1
+          region: "{{ region }}"
           rules:
             - proto: tcp
               from_port: 22
@@ -19,13 +23,13 @@
       - name: Provision an instance
 
         ec2:
-          key_name: pqp
+          key_name: "{{ keypair }}"
           instance_type: t2.micro
           image: ami-042e8287309f5df03 # Ubuntu 20.04 Server AMI
           group: sec group
           wait: true
           exact_count: 1
-          region: us-east-1
+          region: "{{ region }}"
           count_tag:
             name: ami_template
           instance_tags: 

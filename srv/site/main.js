@@ -77,7 +77,7 @@ function probeInstances()
 
     var xhr = new XMLHttpRequest();
     xhr.addEventListener("load", parseInstances);
-    xhr.open("GET", "/awsdata", true);
+    xhr.open("GET", "/get/instances", true);
 
     xhr.send();
 }

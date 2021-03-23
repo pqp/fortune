@@ -4,35 +4,41 @@ import { EC2Client, DescribeInstancesCommand } from "@aws-sdk/client-ec2";
 import path from "path";
 
 const app = express();
-const port = 3000;
+const port = 5000;
 
 const __dirname = path.resolve();
 
 const client = new EC2Client({region: 'us-east-1'});
 
-app.use(express.static(path.join(__dirname + '/../site/')));
+app.use(express.static(path.join(__dirname + '/site/')));
 
 async function sendCommand(command, req, res)
 {
-    const data = await client.send(command);
-
-    res.send(data);
+    try {
+        const data = await client.send(command);
+        res.send(data);
+    } catch (error) {
+        console.log(error, error.stack);
+    } finally {
+    }
 }
 
-app.get('/ttyshare', (req, res) => {
+app.get('/get/tty', (req, res) => {
 });
 
-app.get('/awsdata', (req, res) => {
+app.get('/get/instances', (req, res) => {
     try {
         const command = new DescribeInstancesCommand({});
         sendCommand(command, req, res);
     } catch (error) {
         console.log(error, error.stack);
-    } 
+    } finally {
+
+    }
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname + '/../site/index.html'));
+    res.sendFile(path.join(__dirname + '/site/index.html'));
 });
 
 app.post('/', function (req, res) {
