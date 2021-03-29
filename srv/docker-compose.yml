@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.4'
 
 services:
   tty-proxy:
@@ -8,7 +8,7 @@ services:
       - 3456:3456
       - 8080:8080
     environment:
-      - URL=http://dev.pondero.org:8080
+      - "URL=http://${PUBLIC_URL}:8080"
 
   tty-share:
     depends_on:
@@ -17,19 +17,30 @@ services:
       context: ./tty-share
     tty: true
     cap_drop:
-      - "all"
-    command: ./tty-share --tty-proxy dev.pondero.org:3456 --no-tls --public
+      - ALL
+    volumes:
+      - url:/app/url
+    entrypoint: >
+      sh -c "tty-share --tty-proxy ${PUBLIC_URL}:3456 --no-tls --public --readonly --command /bin/sh > app/url/link"
 
   srv:
     depends_on:
       - "tty-share"
     build:
       context: .
+      network: host
+    network_mode: host
+    expose:
+      - 25
     ports:
       - 5000:5000
+    volumes:
+      - url:/app/url
+      - ./:/app
     environment:
       - AWS_ACCESS_KEY_ID=
       - AWS_SECRET_ACCESS_KEY=
-    volumes:
-      - ./:/app
     command: npm run debug
+
+volumes:
+  url:

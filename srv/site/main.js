@@ -6,16 +6,17 @@ var footerText = document.getElementById('message');
 
 function subscribe()
 {
-    let emailAddress = document.getElementById('test').value;
+    let emailAddress = document.getElementById('email').value;
+    console.log(emailAddress);
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", '/', true);
+    xhr.open("POST", `/subscribe/email/${emailAddress}`, true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
     xhr.onreadystatechange = function() {
         updateFooter("POST sent to server")
     }
-    xhr.send(`email=${emailAddress}&subscribe=true`);
+    xhr.send();
 }
 
 function updateFooter(message)
@@ -23,6 +24,7 @@ function updateFooter(message)
     footerText.innerText = message;
 }
 
+// Build out the list of instances hosting the site
 function parseInstances()
 {
     const response = JSON.parse(this.responseText);
@@ -82,6 +84,24 @@ function probeInstances()
     xhr.send();
 }
 
+function spliceTTY()
+{
+    var one = /https?\:\/\/[^\" ]+/i.exec(this.responseText);
+    var urla = /^(.*)$/m.exec(one[0]);
+
+    let iFrame = document.getElementById('consoleView');
+    iFrame.setAttribute('src', urla[0]);
+}
+
+function getTTY()
+{
+    var xhr = new XMLHttpRequest();
+    xhr.addEventListener("load", spliceTTY);
+    xhr.open("GET", "/get/tty", true);
+
+    xhr.send();
+}
+
 function terminateInstance(e)
 {
     console.log("Test!");
@@ -89,3 +109,4 @@ function terminateInstance(e)
 }
 
 probeInstances();
+getTTY();

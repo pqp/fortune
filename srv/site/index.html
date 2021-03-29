@@ -2,7 +2,7 @@
 <html>
     <link href="styles.css" rel="stylesheet">
     <head>
-        <script src="bundle.js" async></script>
+        <script src="main.js" async></script>
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@500&display=swap" rel="stylesheet"> 
         <meta charset="utf-8">
@@ -11,16 +11,18 @@
     <body>
         <div class="main">
             <h1>Subscribe for a daily fortune!</h1>
-            <h2 id="fortune">You feel like you could...like you could...TAKE ON THE WORLD!</h2>
-            <input type="email" id="test">
+            <h2 id="fortune">(you can unsubscribe at any time)</h2>
+            <input type="email" id="email">
             <button id="subscribe">Subscribe</button>
         </div>
+        <!--
         <div class="sidebar">
-            <p>your server IP: 192.168.0.1</p>
+            <p>you have been served by: 192.168.0.1</p>
             <p id="ticker">total servers allocated: </p>
             <ul id="serverlist"></ul>
             </ul>
         </div>
+        -->
         <iframe class="view" id="consoleView"
             title="Console View"
             width="720"

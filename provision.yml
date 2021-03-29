@@ -1,19 +1,135 @@
 ---
+  - hosts: localhost
+    gather_facts: False
 
-  - name: Initial setup
-    hosts: aws
-    remote_user: ec2-user
-    
+    vars:
+      keypair: pqp
+      region: us-east-1
+
     tasks:
-    - name: Ensure NodeJS is installed
-      become: yes
-      yum:
-        name: nodejs
-        state: latest
 
-    - name: Sync codebase
-      synchronize: 
-        src: ~/fortune/site
-        dest: ~/site
-        rsync_opts:
-          - "--exclude=node_modules"
+      - name: Create a security group
+
+        amazon.aws.ec2_group:
+          name: sec group
+          description: basic sec group
+          region: "{{ region }}"
+          rules:
+            - proto: tcp
+              from_port: 22
+              to_port: 22
+              cidr_ip: 0.0.0.0/0
+
+      - name: Provision an instance
+
+        ec2:
+          key_name: "{{ keypair }}"
+          instance_type: t2.micro
+          image: ami-042e8287309f5df03 # Ubuntu 20.04 Server AMI
+          group: sec group
+          wait: true
+          exact_count: 1
+          region: "{{ region }}"
+          count_tag:
+            name: ami_template
+          instance_tags: 
+            name: ami_template
+        register: ec2
+
+      - name: Add instance IP to host group
+        add_host: hostname={{ item.public_ip }} groups=amihosts
+        loop: "{{ ec2.instances }}"
+
+  - hosts: amihosts
+    gather_facts: False
+    remote_user: ubuntu
+    become: yes
+    vars:
+      nodejs_version: node_14.x
+      ubuntu_codename: focal
+
+    tasks:
+
+      - name: Wait for SSH
+        wait_for_connection:
+          delay: 60
+          timeout: 320
+
+      - name: Gather facts
+        setup:      
+
+      - name: Get Docker GPG key
+        apt_key: 
+          url: https://download.docker.com/linux/ubuntu/gpg
+          state: present
+
+      - name: Add Docker repository
+        apt_repository:
+          repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+          state: present
+
+      - name: Update apt cache
+        apt:
+          update_cache: yes
+
+      - name: Upgrade
+        apt:
+          upgrade: full
+
+      - name: Install prelims
+        apt:
+          pkg:
+          - git 
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+          state: latest
+
+      - name: Install Docker
+        apt:
+          pkg: 
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+      
+      #- name: Download docker-compose
+      #  get_url:
+      #    url: "https://github.com/docker/compose/releases/download/1.28.6/docker-compose-Linux-x86_64"
+      #    dest: /bin/docker-compose
+
+      - name: Clone git repo
+        git:
+          repo: https://github.com/pqp/fortune.git
+          dest: /srv/fortune
+
+      - name: Start server
+        community.docker.docker_compose:
+          project_src: /srv/fortune/srv
+        register: output
+
+      - ansible.builtin.debug:
+          var: output
+
+  - hosts: localhost
+    gather_facts: False
+
+    tasks:
+
+      - name: Create AMI
+
+        amazon.aws.ec2_ami:
+          instance_id: "{{ ec2.instance_ids[0] }}"
+          region: us-east-1
+          wait: yes
+          name: newtest
+          tags:
+            Name: newtesttag
+            Service: TestService
+
+      - name: Print string
+        
+        ansible.builtin.debug:
+          msg: "{{ ec2.instance_ids }}"
+        #loop: "{{ ec2.instances }}"

@@ -5,7 +5,13 @@ body {
 }
 
 div.main {
+    margin-top: 100px;
+    margin-bottom: 20px;
     text-align: center;
+}
+
+div.main input {
+
 }
 
 div.sidebar {
@@ -34,9 +40,11 @@ div#footer {
     width: 100%;
     display: block;
 
-    background-color: #FFFFFF20;
+    background-color: #202020;
 }
 
 div#footer p {
     color: #FFFFFFFF;
+
+    padding-left: 10px;
 }
