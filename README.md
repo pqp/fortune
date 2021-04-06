@@ -1,6 +1,6 @@
 # fortune
 
-A simple "fortune-of-the-day" email subscription service that I'm working on. It's mostly intended to demonstrate my competence with web development, backend work, automation and CI pipelines.
+A simple "fortune-of-the-day" email subscription service that I'm working on. It's mostly intended to demonstrate my competence in web development, backend work, automation and CI pipelines.
 
 # Running
 
